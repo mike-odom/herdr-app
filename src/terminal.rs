@@ -266,6 +266,13 @@ impl TerminalView {
             search_task: None,
             _reader: None,
         };
+        // The view's images are in GPUI's sprite atlas: closing the pane must free them too.
+        cx.on_release(|view, cx| {
+            for (_, image) in view.grid.borrow_mut().images.drain() {
+                cx.drop_image(image, None);
+            }
+        })
+        .detach();
         view.connect(core, false, cx);
         view
     }
@@ -1573,7 +1580,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
             images.push((below, Bounds::new(pos, size(px(width), px(height))), img.clone()));
         }
     }
-    g.images.retain(|k, _| keep.contains(k));
+    // Dropping the handle does not free the atlas texture: an image that is no longer shown (a program replacing
+    // an image every frame, say) must be evicted explicitly or its GPU and RAM copy stays for the app's lifetime.
+    g.images.retain(|key, image| {
+        if keep.contains(key) {
+            return true;
+        }
+        cx.drop_image(image.clone(), Some(window));
+        false
+    });
     let link_spans = g.link_spans.clone();
     let marked = g.marked.clone();
     drop(g);
