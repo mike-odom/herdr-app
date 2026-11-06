@@ -13,6 +13,9 @@ and local mods.
   `herdr-app` kept one GPU copy of every painted image (88 GB of GTT after a 2 h 22 min browser session).
 - `fix/kitty-image-files`: upstream PR [#210](https://github.com/herdrdev/herdr-app/pull/210): programs on this
   machine can send Kitty images as files, which makes `terminal-browser` smooth.
+- `feat/layout-toast-mod`: upstream PR [#364](https://github.com/herdrdev/herdr-app/pull/364): a layout can name the
+  mod that shows notifications (`"toast": "<mod>"`). The personal `win98-quiet` layout uses it with a `silent` mod
+  (both in `~/.config/herdr-app`, not in this repo) so only Clippy alerts, no corner toast.
 
 Each commit keeps its original author. Drop a commit from `mike/main` once its PR is merged upstream.
 
